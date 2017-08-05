@@ -67,11 +67,13 @@ describe('testBlog', function() {
   //  2. inspect response object and prove it has right
   //  status code and that the returned object has an `id`
   it('should add an item on POST', function() {
-    const newItem = {name: 'newBlogPost', content:'123454321', author:'yoursTruly'};
+    const newItem = {title: 'newBlogPost', content:'123454321', author:'yoursTruly'};
+    console.log('micCheck');
     return chai.request(app)
       .post('/blog-posts')
       .send(newItem)
       .then(function(res) {
+        console.log(res.body, Object.assign(newItem, {id: res.body.id}));
         res.should.have.status(201);
         res.should.be.json;
         res.body.should.be.a('object');
@@ -79,7 +81,7 @@ describe('testBlog', function() {
         res.body.id.should.not.be.null;
         // response should be deep equal to `newItem` from above if we assign
         // `id` to it from `res.body.id`
-        res.body.should.deep.equal(Object.assign(newItem, {id: res.body.id}));
+        res.body.should.deep.equal(Object.assign({}, newItem, {id: res.body.id, publishDate: res.body.publishDate}));
       });
   });
 
@@ -95,22 +97,18 @@ describe('testBlog', function() {
     // we initialize our updateData here and then after the initial
     // request to the app, we update it with an `id` property so
     // we can make a second, PUT call to the app.
-    const updateData = {
-      title:'12321',
-      content: '0987890',
-      author:'yoursTruly'
-    };
 
     return chai.request(app)
-      // first have to get so we have an idea of object to update
+      // first have to get 
       .get('/blog-posts')
       .then(function(res) {
-        updateData.id = res.body[0].id;
-        // this will return a promise whose value will be the response
-        // object, which we can inspect in the next `then` back. Note
-        // that we could have used a nested callback here instead of
-        // returning a promise and chaining with `then`, but we find
-        // this approach cleaner and easier to read and reason about.
+
+        //IMMUTABILITY PATTERN
+        const updateData = Object.assign({}, res.body[0], {
+          title:'12321',
+          content: '0987890'
+        });
+        
         return chai.request(app)
           .put(`/blog-posts/${updateData.id}`)
           .send(updateData);
@@ -118,10 +116,7 @@ describe('testBlog', function() {
       // prove that the PUT request has right status code
       // and returns updated item
       .then(function(res) {
-        res.should.have.status(200);
-        res.should.be.json;
-        res.body.should.be.a('object');
-        res.body.should.deep.equal(updateData);
+        res.should.have.status(204);
       });
   });
 

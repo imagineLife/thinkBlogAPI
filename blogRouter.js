@@ -16,11 +16,14 @@ BlogPosts.create('Title5', 'content5', 'author5');
 
 // when the root of this router is called with GET, return
 // all current BlogPosts items
-router.get('/blog-posts', (req, res) => {
+
+//**WHY NOT THIS?!
+// router.get('/blog-posts', (req, res) => {
+router.get('/', (req, res) => {
   res.json(BlogPosts.get());
 });
 
-router.post('/blog-posts', jsonParser, (req, res) => {
+router.post('/', jsonParser, (req, res) => {
   // ensure `id`, `title`, `content` & `author` are in the post
   const requiredFields = [`title`, `content`, `author`];
   for (let i=0; i<requiredFields.length; i++) {
@@ -42,9 +45,10 @@ router.post('/blog-posts', jsonParser, (req, res) => {
 // of that, log error and send back status code 400. otherwise
 // call `BlogPosts.update` with updated item.
 
-router.put('/blog-posts/:id', jsonParser, (req, res) => {
+router.put('/:id', jsonParser, (req, res) => {
   const requiredFields = [`title`, `content`, `author`];
   //loop through inputs, if one is missing alert user it is missing
+
   for (i=0; i<requiredFields.length; i++) {
     const field = requiredFields[i];
     if (!(field in req.body)) {
@@ -68,14 +72,16 @@ router.put('/blog-posts/:id', jsonParser, (req, res) => {
     id: req.body.id,
     title: req.body.title,
     content: req.body.content,
-    author: req.body.author
+    author: req.body.author,
+//NEEDED?!
+    publishDate: req.body.publishDate
   });
   res.status(204).end();
 });
 
 // when DELETE request comes in with an id in path,
 // try to delete that item from BlogPosts.
-router.delete('/blog-posts/:id', (req, res) => {
+router.delete('/:id', (req, res) => {
   BlogPosts.delete(req.params.id);
   console.log(`Deleted blog post \`${req.params.id}\``);
   res.status(204).end();

@@ -1,15 +1,13 @@
 const express = require('express');
 const morgan = require('morgan');
 
-const app = express();
-
 const blogRouter = require('./blogRouter');
+
+//is this order mandatory?
+const app = express();
 
 // log the http layer
 app.use(morgan('common'));
-
-app.use(express.static('public'));
-
 
 app.use('/blog-posts', blogRouter);
 
