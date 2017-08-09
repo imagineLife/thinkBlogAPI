@@ -17,8 +17,6 @@ BlogPosts.create('Title5', 'content5', 'author5');
 // when the root of this router is called with GET, return
 // all current BlogPosts items
 
-//**WHY NOT THIS?!
-// router.get('/blog-posts', (req, res) => {
 router.get('/', (req, res) => {
   res.json(BlogPosts.get());
 });
@@ -38,12 +36,6 @@ router.post('/', jsonParser, (req, res) => {
   const item = BlogPosts.create(req.body.title, req.body.content, req.body.author);
   res.status(201).json(item);
 });
-
-// when PUT request comes in with updated item, ensure has
-// required fields. also ensure that item id in url path, and
-// item id in updated item object match. if problems with any
-// of that, log error and send back status code 400. otherwise
-// call `BlogPosts.update` with updated item.
 
 router.put('/:id', jsonParser, (req, res) => {
   const requiredFields = [`title`, `content`, `author`];
