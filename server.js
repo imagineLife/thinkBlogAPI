@@ -6,7 +6,7 @@ const morgan = require('morgan');
 const {DATABASE_URL, PORT} = require('./config');
 const {BlogPost} = require('./models');
 
-// const blogRouter = require('./blogRouter');
+const blogRouter = require('./blogRouter');
 
 //is this order mandatory?
 const app = express();
@@ -15,26 +15,9 @@ const app = express();
 app.use(morgan('common'));
 app.use(bodyParser.json());
 
+app.use('/posts', blogRouter);
+
 mongoose.Promise = global.Promise;
-
-// app.use('/blog-posts', blogRouter);
-
-app.get('/posts', (req, res) => {
-  BlogPost
-    .find()
-    .exec()
-    .then(posts => {
-      console.log('*****\n', 
-       'post should be here?! ', posts + '\n',
-        '*****');
-      res.json(posts.map(post => post.apiRepr()));
-    })
-    .catch(err => {
-      console.error(err);
-      res.status(500).json({error: 'something went terribly wrong'});
-    });
-});
-
 
 app.use('*', function(req, res) {
   res.status(404).json({message: 'Not Found'});

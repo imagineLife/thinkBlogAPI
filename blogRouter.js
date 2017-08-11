@@ -1,98 +1,108 @@
 const bodyParser = require('body-parser');
 const express = require('express');
-// const mongoose = require('mongoose');
 const router = express.Router();
 
 const jsonParser = bodyParser.json();
 
 const {BlogPost} = require('./models');
-// mongoose.Promise = global.Promise;
 
 //GET
-router.get('/posts', jsonParser, (req, res) => {
+router.get('/', (req, res) => {
   BlogPost
     .find()
     .exec()
-    .then((posts) => {
-      console.log('' +
-        '***\n' +
-        'blogdata from db should be ', posts, '\n'+
-        '***');
-      res.json({
-        blogposts: posts.map(
-          posts => posts.apiRepr())
-      });
+    .then(posts => {
+      res.json(posts.map(post => post.apiRepr()));
+    })
+    .catch(err => {
+      console.error(err);
+      res.status(500).json({error: 'something went terribly wrong'});
     });
+});
 
-  // res.json(BlogPost.findOne());
+//GET
+router.get('/:id', (req, res) => {
+  BlogPost
+    .findById(req.params.id)
+    .exec()
+    .then(blogPostResult =>
+        res.json(blogPostResult.apiRepr()))
+    .catch(err => {
+      console.error(err);
+      res.status(500).json({error: 'something went terribly wrong'});
+    });
+});
 
-  // .catch(
-  //     err => {
-  //       console.error(err);
-  //       res.status(500).json({message: 'Internal server error'});
-  //   });
+// //ADD
+router.post('/', jsonParser, (req, res) => {
+  // ensure `id`, `title`, `content` & `author` are in the post
+  const requiredFields = [`title`, `content`, `author`];
+  for (let i=0; i<requiredFields.length; i++) {
+    const field = requiredFields[i];
+    if (!(field in req.body)) {
+      const message = `Missing \`${field}\` in request body`
+      console.error(message);
+      return res.status(400).send(message);
+    }
+    // console.log(requiredFields[i]);
+  }
+
+  BlogPost
+  .create({
+    title : req.body.title, 
+    content: req.body.content, 
+    author: req.body.author
+  })
+  .then(blogPost => res.status(201).json(blogPost.apiRepr()))
+  .catch(err => {
+      console.error(err);
+      res.status(500).json({error: 'Something went wrong'});
+  });
 });
 
 
-// //ADD
-// router.post('/', jsonParser, (req, res) => {
-//   // ensure `id`, `title`, `content` & `author` are in the post
-//   const requiredFields = [`title`, `content`, `author`];
-//   for (let i=0; i<requiredFields.length; i++) {
-//     const field = requiredFields[i];
-//     if (!(field in req.body)) {
-//       const message = `Missing \`${field}\` in request body`
-//       console.error(message);
-//       return res.status(400).send(message);
-//     }
-//   }
+//UPDATE
+router.put('/:id', (req, res) => {
+  //NOTE: this doesn't check the DB if the requested ID matches and ID in the DB
 
-//   const item = BlogPosts.create(req.body.title, req.body.content, req.body.author);
-//   res.status(201).json(item);
-// });
+  //validate that the id in the url matches the id in the body of the request object
+  if (req.params.id !== req.body.id) {
+    res.status(400).json({
+      error: "the two requesting ids don't match"
+    });
+  }
+ 
+  const updatingObj = {};
 
+  const updatableFields = ['title', 'content', 'author'];
 
-// //UPDATE
-// router.put('/:id', jsonParser, (req, res) => {
-//   const requiredFields = [`title`, `content`, `author`];
-//   //loop through inputs, if one is missing alert user it is missing
+  updatableFields.forEach(field => {
+    if (field in req.body){
+      updatingObj[field] = req.body[field];
+    }
+  });
 
-//   for (i=0; i<requiredFields.length; i++) {
-//     const field = requiredFields[i];
-//     if (!(field in req.body)) {
-//       const displayMessage = `Missed the \`${field}\` field!`;
-//       console.log(displayMessage);
-//       return res.status(400).send(displayMessage);
-//     }
-//   }
+  // console.log(updatingObj);
 
-//   //if the id in the parameters is NOT the same as the 
-//   //ID in the body, alert user
-//   if (req.params.id !== req.body.id) {
-//     const errorMessage = `the id's not match, ya fool. cant mess with id ${req.params.id} and ${req.body.id}.`;
-//     console.error(errorMessage);
-//     return res.status(400).send(errorMessage);
-//   }
+  BlogPost
+    .findByIdAndUpdate(req.params.id, {$set: updatingObj}, {new: true})
+    .exec()
+    .then(postThatGotUpdated => res.status(201).json(postThatGotUpdated.apiRepr()))
+    .catch(err => res.status(500).json({message: "something in the PUT messed up"}));
 
-//   //update the recipe with given ID
-//   console.log(`Updating blog-post \`${req.params.id}\``);
-//   BlogPosts.update({
-//     id: req.body.id,
-//     title: req.body.title,
-//     content: req.body.content,
-//     author: req.body.author,
-// //NEEDED?!
-//     publishDate: req.body.publishDate
-//   });
-//   res.status(204).end();
-// });
+});
 
 
-// //DELETE
-// router.delete('/:id', (req, res) => {
-//   BlogPosts.delete(req.params.id);
-//   console.log(`Deleted blog post \`${req.params.id}\``);
-//   res.status(204).end();
-// });
+//DELETE
+router.delete('/:id', (req,res) =>{
+  BlogPost
+    .findByIdAndRemove(req.params.id)
+    .exec()
+    .then(() => {
+      res.status(204).end();
+    })
+    .catch(err => res.status(500).json({message: "something in the PUT messed up"}));
+;
+});
 
 module.exports = router;

@@ -15,9 +15,8 @@ blogPostSchema.virtual('authorName').get(function() {
 });
 
 blogPostSchema.methods.apiRepr = function() {
-  
   return {
-    id: this._id,
+    // id: this._id,
     title: this.title,
     content: this.content,
     author: this.authorName,
@@ -25,5 +24,6 @@ blogPostSchema.methods.apiRepr = function() {
   };
 };
 
-const BlogPost = mongoose.model('BlogPost', blogPostSchema);
+const BlogPost = mongoose.model('collblog', blogPostSchema);
 module.exports = {BlogPost};
+//exporting a wrapper object that has ablogPost property, set to blogpost
