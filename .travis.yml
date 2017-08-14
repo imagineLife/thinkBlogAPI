@@ -1,4 +1,12 @@
 language: node_js
 node_js: node
 services:
-  - mongodb
+- mongodb
+deploy:
+  provider: heroku
+  api_key:
+    secure: bf9uCjoG4/DflbLLCXuLSiFWqz0AA6vRxle2uyPOl8MahWMzb+tbCd9ussqXFDSzuENyp0Fnb5CXJzZPXgSwd2zvFmvSwQSxvTE2ULePLytBW0Ivo3N2fkRjdUfT6E+KOjYQuoBKUbNXx2nkkAoKLtSWfjoZEM/+CkDxNIA/2vMU9nJLspDJ81UsJ0KHjed2p6VYUxE+wuRbVWbkWP1d2BI/oKFtwz1mxaDnMxgKvN2F6s6bhOzkvZnBzMEe1YIFRTd3HMlz+u+XeA08CdW1LMvIPWht+TFyyxigqFsxD4HPf3IJd4h4XJGQJzCwb0qDKeU2sAIIGEdDIJzCuJkyQYaRSQ69oUEorfSBhs2nT/nLlM+OP/caeBdTN60Ccwtd6rYYhBayNjcAwINTdcmLPHLkyoDsVyMgYYB47zZnkckrM7q6bYK69Xg62xpBGId0L4b7E/5pJWq4Fu0fL7guyFXxisvGhfJ9DvEe3yfFvPWmHHPEwvreH6z7BEfeP2hSb/vo3OjFEtWOSomYxR7dRQZ8iH6cd+a+G4eVUkxvgY4qKnwKRoqLvqN4HA3W8IrOoYIHQ9tAnIrVv0vWf6aid4k06XAMxdchtx4fBzQZACegvcFfsMNXRB4tpbKmeSz78nWWV6gAo5hG7SsTymw+aXZKS0/PUAlEEUqDbOcZ55g=
+  app: cryptic-hollows-78908
+  on:
+    repo: imagineLife/thinkBlogAPI
+    app: morning-shore-92350
